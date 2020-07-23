@@ -56,9 +56,9 @@ func Setup(isCheckTx bool, tmpDir string) *wasmd.WasmApp {
 
 // SetupWithGenesisAccounts initializes a new wasmd.WasmApp with the passed in
 // genesis accounts.
-func SetupWithGenesisAccounts(genAccs []authtypes.GenesisAccount) *wasmd.WasmApp {
+func SetupWithGenesisAccounts(tmpDir string, genAccs ...authtypes.GenesisAccount) *wasmd.WasmApp {
 	db := dbm.NewMemDB()
-	app := wasmd.NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0, map[int64]bool{}, "")
+	app := wasmd.NewWasmApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, 0, map[int64]bool{}, tmpDir)
 
 	// initialize the chain with the passed in genesis accounts
 	genesisState := wasmd.NewDefaultGenesisState()

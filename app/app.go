@@ -132,7 +132,8 @@ var _ simapp.App = (*WasmApp)(nil)
 // WasmApp extended ABCI application
 type WasmApp struct {
 	*baseapp.BaseApp
-	cdc *codec.Codec
+	cdc      *codec.Codec
+	appCodec codec.Marshaler
 
 	invCheckPeriod uint
 
@@ -161,6 +162,7 @@ type WasmApp struct {
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
 	// the module manager
 	mm *module.Manager
@@ -201,6 +203,7 @@ func NewWasmApp(
 	app := &WasmApp{
 		BaseApp:        bApp,
 		cdc:            cdc,
+		appCodec:       appCodec,
 		invCheckPeriod: invCheckPeriod,
 		keys:           keys,
 		tkeys:          tkeys,
@@ -414,6 +417,7 @@ func NewWasmApp(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.ScopedWasmKeeper = scopedWasmKeeper
 
 	return app
 }
@@ -466,6 +470,14 @@ func (app *WasmApp) BlockedAddrs() map[string]bool {
 // Codec returns the application's sealed codec.
 func (app *WasmApp) Codec() *codec.Codec {
 	return app.cdc
+}
+
+// AppCodec returns the app codec.
+//
+// NOTE: This is solely to be used for testing purposes as it may be desirable
+// for modules to register their own custom testing types.
+func (app *WasmApp) AppCodec() codec.Marshaler {
+	return app.appCodec
 }
 
 // SimulationManager implements the SimulationApp interface
